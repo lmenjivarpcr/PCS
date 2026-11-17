@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(SuperadministradorSeeder::class);
+        $this->call([PermisosSeeder::class, SuperadministradorSeeder::class]);
 
         if (app()->environment('local') && ! User::query()->where('correo', 'test@example.com')->exists()) {
             User::factory()->create([
