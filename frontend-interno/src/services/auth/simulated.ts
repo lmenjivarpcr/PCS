@@ -1,7 +1,8 @@
 import { AuthError, type AuthService } from "./types";
 /** Sin Microsoft ni backend. Después se usará MSAL para obtener la identidad
  * Microsoft y Laravel para validar el usuario de PCS. Solo este simulador lee
- * ?simular=no-registrado y ?simular=conexion. La sesión se pierde al recargar.
+ * ?simular=consulta, ?simular=no-registrado y ?simular=conexion.
+ * La sesión se pierde al recargar.
  */
 export class SimulatedAuthService implements AuthService {
   private async esperar() {
@@ -24,6 +25,15 @@ export class SimulatedAuthService implements AuthService {
       id: "interno-demo",
       nombre: "Usuario de prueba",
       correo: "interno@ejemplo.test",
+      perfil: escenario === "consulta" ? "Consulta" : "Administrador",
+      permisos:
+        escenario === "consulta"
+          ? ["usuarios.internos.leer"]
+          : [
+              "usuarios.internos.leer",
+              "usuarios.internos.crear",
+              "usuarios.internos.editar",
+            ],
     };
   }
   async cerrarSesion() {

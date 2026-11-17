@@ -2,6 +2,8 @@ export interface Usuario {
   id: string;
   nombre: string;
   correo: string;
+  perfil: string;
+  permisos: string[];
 }
 export interface AuthService {
   iniciarSesionMicrosoft(): Promise<Usuario>;

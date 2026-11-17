@@ -22,7 +22,8 @@
   --border: #cbd5e1;
   --input: #64748b;
   --ring: #475569;
-  --destructive: #334155;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
   --radius: 0.75rem;
 }
 @theme inline {
@@ -42,6 +43,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --radius-lg: var(--radius);
 }
 @layer base {
@@ -49,7 +51,7 @@
     @apply border-border;
   }
   body {
-    @apply m-0 min-w-[360px] bg-background text-foreground antialiased;
+    @apply m-0 min-w-[320px] bg-background text-foreground antialiased;
   }
   button,
   input {
@@ -64,5 +66,13 @@
   }
   a:focus-visible {
     @apply rounded-sm outline-2 outline-offset-4 outline-ring;
+  }
+  input,
+  select {
+    @apply min-h-11 w-full rounded-md border border-input bg-card px-3 py-2 text-sm;
+  }
+  input:focus-visible,
+  select:focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
   }
 }
