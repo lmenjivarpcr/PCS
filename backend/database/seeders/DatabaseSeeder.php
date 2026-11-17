@@ -15,11 +15,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'nombre' => 'Usuario de prueba',
-            'correo' => 'test@example.com',
-            'tipo' => 'interno',
-            'activo' => true,
-        ]);
+        $this->call(SuperadministradorSeeder::class);
+
+        if (app()->environment('local') && ! User::query()->where('correo', 'test@example.com')->exists()) {
+            User::factory()->create([
+                'nombre' => 'Usuario de prueba',
+                'correo' => 'test@example.com',
+                'tipo' => 'interno',
+                'activo' => true,
+            ]);
+        }
     }
 }
