@@ -29,7 +29,7 @@ class EsquemaBaseTest extends TestCase
             'usuario_permiso' => ['usuario_id', 'permiso_id', 'efecto', 'creado_por', 'actualizado_por', 'creado_en', 'actualizado_en'],
             'funciones_equipo' => ['id', 'codigo', 'nombre', 'activo', 'creado_en', 'actualizado_en'],
             'funcion_permiso' => ['funcion_id', 'permiso_id'],
-            'autorizacion_cambios' => ['id', 'actor_id', 'entidad', 'entidad_id', 'anterior', 'nuevo', 'creado_en'],
+            'bitacora' => ['id', 'actor_id', 'accion', 'entidad', 'entidad_id', 'anterior', 'nuevo', 'ip', 'agente', 'ocurrido_en'],
             'equipos_predefinidos' => ['id', 'nombre', 'activo', 'creado_en', 'actualizado_en'],
             'integrantes_equipo_predefinido' => ['equipo_id', 'usuario_id', 'funcion_id'],
             'paises' => ['id', 'codigo', 'nombre', 'activo', 'creado_en', 'actualizado_en'],
@@ -44,6 +44,7 @@ class EsquemaBaseTest extends TestCase
         }
 
         $this->assertFalse(Schema::hasTable('users'));
+        $this->assertFalse(Schema::hasTable('autorizacion_cambios'));
         $this->assertTrue(Schema::hasTable('password_reset_tokens'));
     }
 
@@ -165,16 +166,17 @@ class EsquemaBaseTest extends TestCase
     public function test_borrar_actor_conserva_la_auditoria_y_anula_su_referencia(): void
     {
         $actor = User::factory()->create();
-        $cambioId = DB::table('autorizacion_cambios')->insertGetId([
+        $cambioId = DB::table('bitacora')->insertGetId([
             'actor_id' => $actor->id,
+            'accion' => 'usuario.creado',
             'entidad' => 'usuarios',
             'entidad_id' => '1',
         ]);
 
         $actor->delete();
 
-        $this->assertDatabaseHas('autorizacion_cambios', ['id' => $cambioId, 'actor_id' => null]);
-        $this->assertNotNull(DB::table('autorizacion_cambios')->find($cambioId)->creado_en);
+        $this->assertDatabaseHas('bitacora', ['id' => $cambioId, 'actor_id' => null]);
+        $this->assertNotNull(DB::table('bitacora')->find($cambioId)->ocurrido_en);
     }
 
     private function crearPermiso(): int

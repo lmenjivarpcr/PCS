@@ -27,22 +27,10 @@ return new class extends Migration
             $table->dateTime('actualizado_en');
             $table->primary(['usuario_id', 'permiso_id']);
         });
-
-        Schema::create('autorizacion_cambios', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('actor_id')->nullable()->constrained('usuarios')->nullOnDelete();
-            $table->string('entidad', 50);
-            $table->string('entidad_id', 100);
-            $table->json('anterior')->nullable();
-            $table->json('nuevo')->nullable();
-            $table->dateTime('creado_en')->useCurrent();
-            $table->index(['entidad', 'entidad_id']);
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('autorizacion_cambios');
         Schema::dropIfExists('usuario_permiso');
         Schema::dropIfExists('perfil_permiso');
     }
