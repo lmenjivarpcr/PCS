@@ -1,0 +1,10 @@
+# Solo se versiona el codigo. La documentacion del levantamiento queda fuera del repositorio.
+/*
+!/.gitignore
+!/.gitattributes
+!/.editorconfig
+!/backend/
+!/frontend-interno/
+!/frontend-cliente/
+!/docker/
+!/docker-compose.yml
