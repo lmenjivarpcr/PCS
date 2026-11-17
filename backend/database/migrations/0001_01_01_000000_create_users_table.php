@@ -24,10 +24,17 @@ return new class extends Migration
             $table->string('nombre', 150);
             $table->string('correo', 190)->unique();
             $table->enum('tipo', ['interno', 'cliente']);
+            $table->string('contrasena')->nullable();
             $table->boolean('activo')->default(true);
             $table->unsignedInteger('version')->default(1);
             $table->dateTime('creado_en');
             $table->dateTime('actualizado_en');
+        });
+
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
@@ -44,6 +51,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('usuarios');
         Schema::dropIfExists('perfiles');
     }

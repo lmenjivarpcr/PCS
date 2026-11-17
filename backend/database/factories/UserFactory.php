@@ -20,4 +20,13 @@ class UserFactory extends Factory
             'activo' => true,
         ];
     }
+
+    /** Usuario del portal del cliente, que entra con contraseña y PIN. */
+    public function cliente(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'tipo' => 'cliente',
+            'contrasena' => 'password',
+        ]);
+    }
 }

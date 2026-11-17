@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['nombre', 'correo', 'tipo', 'perfil_id', 'activo'])]
+#[Fillable(['nombre', 'correo', 'tipo', 'perfil_id', 'activo', 'contrasena'])]
+#[Hidden(['contrasena'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -23,6 +25,14 @@ class User extends Authenticatable
     protected $table = 'usuarios';
 
     protected $rememberTokenName = '';
+
+    /** Solo los usuarios cliente tienen contraseña; los internos entran con Microsoft. */
+    protected $authPasswordName = 'contrasena';
+
+    public function getEmailForPasswordReset(): string
+    {
+        return $this->correo;
+    }
 
     public function perfil(): BelongsTo
     {
@@ -37,6 +47,6 @@ class User extends Authenticatable
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['activo' => 'boolean'];
+        return ['activo' => 'boolean', 'contrasena' => 'hashed'];
     }
 }

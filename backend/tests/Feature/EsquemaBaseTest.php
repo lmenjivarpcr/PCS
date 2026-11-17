@@ -8,6 +8,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -19,7 +20,7 @@ class EsquemaBaseTest extends TestCase
     {
         $tablas = [
             'perfiles' => ['id', 'codigo', 'nombre', 'activo', 'version', 'creado_en', 'actualizado_en'],
-            'usuarios' => ['id', 'perfil_id', 'nombre', 'correo', 'tipo', 'activo', 'version', 'creado_en', 'actualizado_en'],
+            'usuarios' => ['id', 'perfil_id', 'nombre', 'correo', 'tipo', 'contrasena', 'activo', 'version', 'creado_en', 'actualizado_en'],
             'identidades_usuario' => ['id', 'usuario_id', 'proveedor', 'emisor', 'sujeto', 'creado_en', 'actualizado_en'],
             'modulos' => ['id', 'codigo', 'nombre', 'orden', 'activo'],
             'grupos_permiso' => ['id', 'modulo_id', 'codigo', 'nombre', 'orden', 'activo'],
@@ -43,7 +44,7 @@ class EsquemaBaseTest extends TestCase
         }
 
         $this->assertFalse(Schema::hasTable('users'));
-        $this->assertFalse(Schema::hasTable('password_reset_tokens'));
+        $this->assertTrue(Schema::hasTable('password_reset_tokens'));
     }
 
     public function test_rechaza_correo_duplicado(): void
@@ -89,6 +90,33 @@ class EsquemaBaseTest extends TestCase
 
         $this->assertTrue($usuario->perfil->is($perfil));
         $this->assertDatabaseCount('perfiles', 1);
+    }
+
+    public function test_cliente_valida_contrasena_guardada_con_hash(): void
+    {
+        $cliente = User::factory()->cliente()->create();
+
+        $this->assertNotSame('password', $cliente->getAuthPassword());
+        // Laravel recibe la clave "password" en las credenciales y la compara con la columna contrasena.
+        $this->assertTrue(Auth::guard()->validate(['correo' => $cliente->correo, 'password' => 'password']));
+        $this->assertFalse(Auth::guard()->validate(['correo' => $cliente->correo, 'password' => 'incorrecta']));
+        $this->assertArrayNotHasKey('contrasena', $cliente->toArray());
+    }
+
+    public function test_usuario_interno_no_requiere_contrasena(): void
+    {
+        $interno = User::factory()->create();
+
+        $this->assertNull($interno->getAuthPassword());
+    }
+
+    public function test_restablecimiento_genera_token_por_correo(): void
+    {
+        $cliente = User::factory()->cliente()->create();
+
+        Password::broker()->createToken($cliente);
+
+        $this->assertDatabaseHas('password_reset_tokens', ['email' => $cliente->correo]);
     }
 
     public function test_autenticacion_consulta_usuarios_por_correo(): void
